@@ -8,7 +8,7 @@ const API_URL = 'https://api.edamam.com/search?app_id=fcfe9462&app_key=dc6cb1d31
 
 const state = {
   selectedRecipe: {},
-  searchResult: {},
+  searchResult: [],
   shoppingList: {}
 }
 
@@ -17,12 +17,21 @@ const mutations = {
     state.searchResult = recipes
   },
   addToList (state, recipe) {
-    state.shoppingList[recipe.url] = recipe
+    state.shoppingList = Object.assign({}, state.shoppingList, {[recipe.url]: recipe})
   },
   removeFromList (state, recipe) {
-    delete state.shoppingList[recipe.url]
+    state.shoppingList = Object.assign({},
+      Object.keys(state.shoppingList).reduce((newShoppingList, key) => {
+        if (key !== recipe.url) {
+          newShoppingList[key] = state.shoppingList[key]
+        }
+        return newShoppingList
+      }, {}))
   },
-  checkIngredient (state, { recipe, ingredientName }) {}
+  checkIngredient (state, {recipe, ingredientName}) {},
+  selectRecipe (state, recipe) {
+    state.selectedRecipe = recipe
+  }
 }
 
 const actions = {
@@ -30,14 +39,18 @@ const actions = {
     fetch(`${API_URL}&q=${query}`)
       .then(res => res.json())
       .then(recipes => {
-        console.log('fetched recipes', recipes)
-        commit('gotRecipes', recipes)
+        commit('gotRecipes', recipes.hits.map(r => r.recipe))
       })
   }
+}
+
+const getters = {
+  isInList: state => recipe => !!state.shoppingList[recipe.url]
 }
 
 export default new Vuex.Store({
   state,
   mutations,
-  actions
+  actions,
+  getters
 })

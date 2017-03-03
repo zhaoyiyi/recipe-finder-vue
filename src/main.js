@@ -6,9 +6,13 @@ import router from './router'
 import store from './store'
 import VueMaterial from 'vue-material'
 
+import { nutrition, roundNumber } from './filters'
+
 Vue.config.productionTip = false
 
 Vue.use(VueMaterial)
+Vue.filter('nutrition', nutrition)
+Vue.filter('roundNumber', roundNumber)
 
 /* eslint-disable no-new */
 new Vue({

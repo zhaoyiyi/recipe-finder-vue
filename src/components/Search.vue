@@ -1,41 +1,53 @@
 <template>
   <section>
-    <h1>search component</h1>
     <form novalidate @submit.stop.prevent="getRecipes(searchText)">
       <md-input-container>
         <label>Search recipes...</label>
         <md-input v-model="searchText"></md-input>
       </md-input-container>
-      <button type="submit">search</button>
+      <md-button class="md-raised" type="submit">Search</md-button>
     </form>
-    {{ searchResult }}
+    <search-result :search-result="searchResult"></search-result>
   </section>
 </template>
 
 <script>
   import { mapState } from 'vuex'
+  import SearchResult from './SearchResult'
 
   export default {
     name: 'search',
+    components: {
+      'search-result': SearchResult
+    },
     data () {
       return {
         searchText: ''
       }
     },
-    computed: {
-      ...mapState({
-        searchResult: 'searchResult'
-      })
-    },
+    computed: mapState({
+      searchResult: 'searchResult'
+    }),
     methods: {
       getRecipes (searchText) {
-        console.log('fetching recipes')
         this.$store.dispatch('getRecipes', searchText)
       }
     }
   }
 </script>
 
-<style scooped>
+<style scoped>
+  form {
+    margin: 1rem;
+  }
 
+  .md-input-container {
+    width: 400px;
+    display: inline-flex;
+    margin-bottom: 0;
+  }
+
+  button.md-button {
+    margin-top: 1rem;
+  }
 </style>
