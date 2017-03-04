@@ -12,11 +12,18 @@
         <md-button class="md-raised"
                    @click.native="removeFromList(recipe)"
                    v-else>Remove from shopping list</md-button>
+        <md-input-container>
+          <label>Number of Servings</label>
+          <md-input type="number"
+                    v-model.number="portion"
+                    @input="updatePortion(portion)">
+          </md-input>
+        </md-input-container>
       </div>
     </md-card>
     <md-card class="ingredients">
       <md-list>
-        <h3 md-subheader>{{ recipe.ingredientLines.length }} Ingredients</h3>
+        <h3 md-subheader>Original Ingredients ({{ recipe.yield }} servings)</h3>
         <md-divider></md-divider>
         <md-list-item v-for="(ingred, index) in recipe.ingredientLines" :key="index">
           <p> {{ ingred }} </p>
@@ -24,10 +31,22 @@
       </md-list>
     </md-card>
 
+    <md-card class="ingredients" v-if="recipe.adjustedIngredients">
+      <md-list>
+        <h3 md-subheader>Adjusted Ingredients ({{ portion }} servings)</h3>
+        <md-divider></md-divider>
+        <md-list-item v-for="(ingred, index) in recipe.adjustedIngredients" :key="index">
+          <p> {{ ingred }} </p>
+        </md-list-item>
+      </md-list>
+    </md-card>
+
     <nutrition-facts
-      :totalWeight="recipe.totalWeight"
-      :totalDaily="recipe.totalDaily"
-      :totalNutrients="recipe.totalNutrients"></nutrition-facts>
+      :servings="portion"
+      :totalWeight="recipe.perUnit.totalWeight"
+      :totalDaily="recipe.perUnit.totalDaily"
+      :totalNutrients="recipe.perUnit.totalNutrients">
+    </nutrition-facts>
   </section>
 </template>
 
@@ -40,6 +59,9 @@
     components: {
       'nutrition-facts': NutritionFacts
     },
+    data () {
+      return { portion: 0 }
+    },
     computed: {
       ...mapState({
         recipe: 'selectedRecipe'
@@ -50,8 +72,11 @@
     },
     methods: {
       ...mapMutations([
-        'addToList', 'removeFromList'
+        'addToList', 'removeFromList', 'updatePortion'
       ])
+    },
+    created () {
+      this.portion = this.recipe.portion
     }
   }
 </script>

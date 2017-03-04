@@ -30,7 +30,12 @@ const mutations = {
   },
   checkIngredient (state, {recipe, ingredientName}) {},
   selectRecipe (state, recipe) {
-    state.selectedRecipe = recipe
+    // set default portion to yield of recipe
+    state.selectedRecipe = Object.assign({}, recipe, {portion: recipe.yield})
+  },
+  updatePortion (state, portion) {
+    const adjustedIngredients = state.selectedRecipe.perUnit.ingredients.map(ingred => updateIngredients(ingred, portion))
+    state.selectedRecipe = Object.assign({}, state.selectedRecipe, {portion}, {adjustedIngredients})
   }
 }
 
@@ -38,9 +43,16 @@ const actions = {
   getRecipes ({commit}, query) {
     fetch(`${API_URL}&q=${query}`)
       .then(res => res.json())
-      .then(recipes => {
-        commit('gotRecipes', recipes.hits.map(r => r.recipe))
-      })
+      .then(recipes => commit('gotRecipes', recipes.hits.map(r => {
+        const portion = r.recipe.yield
+        // get per unit values
+        const totalNutrients = getPerUnitValue(r.recipe.totalNutrients, portion)
+        const totalDaily = getPerUnitValue(r.recipe.totalDaily, portion)
+        const totalWeight = Math.round(r.recipe.totalWeight / portion)
+        const ingredients = r.recipe.ingredientLines.map(ingred => updateIngredients(ingred, 1 / portion))
+
+        return Object.assign({}, r.recipe, {perUnit: {totalNutrients, totalDaily, totalWeight, ingredients}})
+      })))
   }
 }
 
@@ -54,3 +66,25 @@ export default new Vuex.Store({
   actions,
   getters
 })
+
+// find single number or fractions(e.g. 1/2, 2/3) then calculate times to portion multiplier value
+function updateIngredients (ingred, multiplier) {
+  return ingred.replace(/\d+\.?\d?/g, number => {
+    console.log(multiplier)
+    if (number.includes('/')) {
+      number = number.split('/').reduce((a, b) => a / b)
+    }
+    // round to 4 decimal places
+    return (Math.round(+number * multiplier * 1000) / 1000) || ''
+    // it may become something like "0.5 0.25 cups of water", this line adds the two numbers up
+  }).replace(/(\d+\.?\d+) (\d+\.?\d+)/g, (match, a, b) => +a + +b)
+}
+
+function getPerUnitValue (nutrients, portion) {
+  let perUnitNutrient = {}
+  for (let key in nutrients) {
+    perUnitNutrient[key] = nutrients[key]
+    perUnitNutrient[key].quantity = nutrients[key].quantity / portion
+  }
+  return perUnitNutrient
+}
