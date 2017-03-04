@@ -69,12 +69,12 @@ export default new Vuex.Store({
 
 // find single number or fractions(e.g. 1/2, 2/3) then calculate times to portion multiplier value
 function updateIngredients (ingred, multiplier) {
-  return ingred.replace(/\d+\.?\d?/g, number => {
+  return ingred.replace(/\d+[./]?\d*/g, number => {
     if (number.includes('/')) {
       number = number.split('/').reduce((a, b) => a / b)
     }
-    // round to 4 decimal places
-    return (Math.round(+number * multiplier * 1000) / 1000) || ''
+    // round to 2 decimal places
+    return (Math.round(+number * multiplier * 100) / 100) || ''
     // it may become something like "0.5 0.25 cups of water", this line adds the two numbers up
   }).replace(/(\d+\.?\d+) (\d+\.?\d+)/g, (match, a, b) => +a + +b)
 }
