@@ -21,25 +21,18 @@
         </md-input-container>
       </div>
     </md-card>
-    <md-card class="ingredients">
-      <md-list>
-        <h3 md-subheader>Original Ingredients ({{ recipe.yield }} servings)</h3>
-        <md-divider></md-divider>
-        <md-list-item v-for="(ingred, index) in recipe.ingredientLines" :key="index">
-          <p> {{ ingred }} </p>
-        </md-list-item>
-      </md-list>
-    </md-card>
+    <ingredients
+      title="Original Ingredients"
+      :ingredients="recipe.ingredientLines"
+      :servings="recipe.yield">
+    </ingredients>
 
-    <md-card class="ingredients" v-if="recipe.adjustedIngredients">
-      <md-list>
-        <h3 md-subheader>Adjusted Ingredients ({{ portion }} servings)</h3>
-        <md-divider></md-divider>
-        <md-list-item v-for="(ingred, index) in recipe.adjustedIngredients" :key="index">
-          <p> {{ ingred }} </p>
-        </md-list-item>
-      </md-list>
-    </md-card>
+    <ingredients
+      v-if="recipe.adjustedIngredients"
+      title="Adjusted Ingredients"
+      :ingredients="recipe.adjustedIngredients"
+      :servings="portion">
+    </ingredients>
 
     <nutrition-facts
       :servings="portion"
@@ -53,11 +46,13 @@
 <script>
   import { mapState, mapGetters, mapMutations } from 'vuex'
   import NutritionFacts from './NutritionFacts'
+  import Ingredients from './Ingredients.vue'
 
   export default {
     name: 'recipe-detail',
     components: {
-      'nutrition-facts': NutritionFacts
+      'nutrition-facts': NutritionFacts,
+      'ingredients': Ingredients
     },
     data () {
       return { portion: 0 }

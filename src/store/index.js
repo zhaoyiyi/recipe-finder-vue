@@ -70,7 +70,6 @@ export default new Vuex.Store({
 // find single number or fractions(e.g. 1/2, 2/3) then calculate times to portion multiplier value
 function updateIngredients (ingred, multiplier) {
   return ingred.replace(/\d+\.?\d?/g, number => {
-    console.log(multiplier)
     if (number.includes('/')) {
       number = number.split('/').reduce((a, b) => a / b)
     }
