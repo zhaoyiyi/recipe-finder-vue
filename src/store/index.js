@@ -84,7 +84,8 @@ const getters = {
   getUncheckedIngredients: state => Object.values(state.shoppingList).map(r => {
     const ingredients = r.ingredients.filter(ingred => !ingred.isChecked)
     return {...r, ingredients}
-  }).filter(r => r.ingredients.length)
+  }).filter(r => r.ingredients.length),
+  shoppingListLength: state => Object.keys(state.shoppingList).length
 }
 
 export default new Vuex.Store({

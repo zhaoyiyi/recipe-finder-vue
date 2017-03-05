@@ -1,6 +1,10 @@
 <template>
   <div>
-    <section class="shopping-list">
+    <h2 v-if="shoppingListLength === 0">
+      Please search and add something to shopping list
+    </h2>
+
+    <section class="shopping-list" v-if="shoppingListLength > 0">
       <md-list class="recipes md-accent">
         <md-subheader>Selected Recipes</md-subheader>
         <md-list-item v-for="(recipe, index) of shoppingList" :key="index">
@@ -54,7 +58,7 @@
       </md-tabs>
     </section>
 
-    <shopping-actions></shopping-actions>
+    <shopping-actions v-if="shoppingListLength > 0"></shopping-actions>
 
   </div>
 
@@ -76,7 +80,7 @@
     },
     computed: {
       ...mapState(['shoppingList']),
-      ...mapGetters(['getIngredients', 'getUncheckedIngredients'])
+      ...mapGetters(['getIngredients', 'getUncheckedIngredients', 'shoppingListLength'])
     },
     methods: {
       onRecipeClick (recipe) {
