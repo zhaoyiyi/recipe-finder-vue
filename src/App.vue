@@ -2,8 +2,8 @@
   <div id="app">
     <md-toolbar>
       <h2 class="md-title">Recipe Finder</h2>
-      <md-button href="#/">Search</md-button>
-      <md-button href="#/shopping-list">Shopping List</md-button>
+      <router-link to="/" class="md-button">Search <md-ink-ripple /></router-link>
+      <router-link to="/shopping-list" class="md-button">Shopping List <md-ink-ripple /></router-link>
     </md-toolbar>
     <router-view></router-view>
   </div>
