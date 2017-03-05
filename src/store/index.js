@@ -18,9 +18,16 @@ const mutations = {
   },
   addToList (state, {recipe, useAdjusted}) {
     let ingredients = useAdjusted ? state.selectedRecipe.adjustedIngredients : state.selectedRecipe.ingredientLines
-    recipe.ingredients = ingredients.map(ingred => ({name: ingred, isChecked: false}))
+    ingredients = ingredients.map(ingred => ({name: ingred, isChecked: false}))
 
-    state.shoppingList = Object.assign({}, state.shoppingList, {[recipe.url]: recipe})
+    state.shoppingList = Object.assign({}, state.shoppingList,
+      {
+        [recipe.url]: {
+          label: recipe.label,
+          ingredients,
+          url: recipe.url
+        }
+      })
   },
   removeFromList (state, recipe) {
     state.shoppingList = Object.assign({},
@@ -31,14 +38,26 @@ const mutations = {
         return newShoppingList
       }, {}))
   },
-  checkIngredient (state, {recipe, ingredientName}) {},
+  checkIngredient (state, {recipe, ingredientName}) {
+    const ingredients = state.shoppingList[recipe.url].ingredients
+      .map(ingred => {
+        if (ingred.name === ingredientName) {
+          return {
+            name: ingred.name,
+            isChecked: !ingred.isChecked
+          }
+        }
+        return ingred
+      })
+    return { ...state.shoppingList, [recipe.url]: { ...recipe, ingredients } }
+  },
   selectRecipe (state, recipe) {
     // set default portion to yield of recipe
-    state.selectedRecipe = Object.assign({}, recipe, {portion: recipe.yield})
+    state.selectedRecipe = { ...recipe, portion: recipe.yield }
   },
   updatePortion (state, portion) {
     const adjustedIngredients = state.selectedRecipe.perUnit.ingredients.map(ingred => updateIngredients(ingred, portion))
-    state.selectedRecipe = Object.assign({}, state.selectedRecipe, {portion}, {adjustedIngredients})
+    state.selectedRecipe = { ...state.selectedRecipe, portion, adjustedIngredients }
   }
 }
 
@@ -60,7 +79,12 @@ const actions = {
 }
 
 const getters = {
-  isInList: state => recipe => !!state.shoppingList[recipe.url]
+  isInList: state => recipe => !!state.shoppingList[recipe.url],
+  getIngredients: state => recipe => state.shoppingList[recipe.url].ingredients,
+  getUncheckedIngredients: state => Object.values(state.shoppingList).map(r => {
+    const ingredients = r.ingredients.filter(ingred => !ingred.isChecked)
+    return {...r, ingredients}
+  }).filter(r => r.ingredients.length)
 }
 
 export default new Vuex.Store({
