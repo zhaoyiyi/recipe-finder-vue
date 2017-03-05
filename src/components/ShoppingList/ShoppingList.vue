@@ -1,64 +1,73 @@
 <template>
-  <section class="shopping-list">
-    <md-list class="recipes md-accent">
-      <md-subheader>Selected Recipes</md-subheader>
-      <md-list-item v-for="(recipe, index) of shoppingList" :key="index">
-        <md-button class="md-button-ghost" @click.native="onRecipeClick(recipe)">{{ recipe.label }}
-        </md-button>
-        <md-button class="md-icon-button md-list-action" @click.native="removeFromList(recipe)">
-          <md-icon>close</md-icon>
-        </md-button>
-      </md-list-item>
-    </md-list>
+  <div>
+    <section class="shopping-list">
+      <md-list class="recipes md-accent">
+        <md-subheader>Selected Recipes</md-subheader>
+        <md-list-item v-for="(recipe, index) of shoppingList" :key="index">
+          <md-button class="md-button-ghost" @click.native="onRecipeClick(recipe)">{{ recipe.label }}
+          </md-button>
+          <md-button class="md-icon-button md-list-action" @click.native="removeFromList(recipe)">
+            <md-icon>close</md-icon>
+          </md-button>
+        </md-list-item>
+      </md-list>
 
-    <md-tabs class="overview md-transparent"
-             v-if="selectedRecipe"
-             @change="n => {activeTabNumber = n}"
-             md-fixed>
-      <md-tab :md-label="selectedRecipe.label" :md-active="activeTabNumber === 0">
-        <p v-for="(ingred, index) in selectedRecipe.ingredients" :key="index">
-          <md-checkbox v-model="ingred.isChecked"
-                      @change="checkIngredient({recipe: selectedRecipe, ingredientName: ingred.name})">
-            {{ ingred.name }}
-          </md-checkbox>
-        </p>
-      </md-tab>
+      <md-tabs class="overview md-transparent"
+               v-if="selectedRecipe"
+               @change="n => {activeTabNumber = n}"
+               md-fixed>
 
-      <md-tab md-label="All Ingredients">
-        <md-list>
-          <template v-for="(recipe, i) in shoppingList">
-            <md-subheader>{{ recipe.label }}</md-subheader>
-            <md-list-item v-for="(ingred, i) in recipe.ingredients" :key="i">
-              <p>{{ ingred.name }}</p>
-            </md-list-item>
-            <md-divider></md-divider>
-          </template>
-        </md-list>
-      </md-tab>
+        <md-tab :md-label="selectedRecipe.label"
+                :style="{display: activeTabNumber === 0 ? 'block' : 'none'}"
+                :md-active="activeTabNumber === 0">
+          <p v-for="(ingred, index) in selectedRecipe.ingredients" :key="index">
+            <md-checkbox v-model="ingred.isChecked"
+                         @change="checkIngredient({recipe: selectedRecipe, ingredientName: ingred.name})">
+              {{ ingred.name }}
+            </md-checkbox>
+          </p>
+        </md-tab>
 
-      <md-tab md-label="Shopping List">
-        <md-list>
-          <template v-for="(recipe, i) in getUncheckedIngredients">
-            <md-subheader>{{ recipe.label }}</md-subheader>
-            <md-list-item v-for="(ingred, i) in recipe.ingredients" :key="i">
-              <p>{{ ingred.name }}</p>
-            </md-list-item>
-            <md-divider></md-divider>
-          </template>
-        </md-list>
-      </md-tab>
+        <md-tab md-label="All Ingredients" :style="{display: activeTabNumber === 1 ? 'block' : 'none'}">
+          <md-list>
+            <template v-for="(recipe, i) in shoppingList">
+              <md-subheader>{{ recipe.label }}</md-subheader>
+              <md-list-item v-for="(ingred, i) in recipe.ingredients" :key="i">
+                <p>{{ ingred.name }}</p>
+              </md-list-item>
+              <md-divider></md-divider>
+            </template>
+          </md-list>
+        </md-tab>
 
-    </md-tabs>
-  </section>
+        <md-tab md-label="Shopping List" :style="{display: activeTabNumber === 2 ? 'block' : 'none'}">
+          <md-list>
+            <template v-for="(recipe, i) in getUncheckedIngredients">
+              <md-subheader>{{ recipe.label }}</md-subheader>
+              <md-list-item v-for="(ingred, i) in recipe.ingredients" :key="i">
+                <p>{{ ingred.name }}</p>
+              </md-list-item>
+              <md-divider></md-divider>
+            </template>
+          </md-list>
+        </md-tab>
+      </md-tabs>
+    </section>
 
-  </section>
+    <shopping-actions></shopping-actions>
+
+  </div>
+
 </template>
 
 <script>
   import { mapState, mapGetters, mapMutations } from 'vuex'
-
+  import ShoppingActions from './ShoppingActions'
   export default {
     name: 'ShoppingList',
+    components: {
+      'shopping-actions': ShoppingActions
+    },
     data () {
       return {
         selectedRecipe: {},
@@ -118,22 +127,22 @@
       height: 100%;
     }
 
-    .recipes {
-      display: none;
-    }
-
-    .shopping-actions {
+    .recipes, .shopping-actions {
       display: none;
     }
   }
 
   @media screen {
-    .overview, .recipes, .md-tab{
-      max-height: 70vh;
-    }
-    .md-tab {
-      overflow-y: auto;
+    .overview, .recipes {
+      height: 70vh;
     }
   }
 
+</style>
+<style>
+  @media screen {
+    .md-tabs .md-tabs-content{
+      overflow-y: scroll;
+    }
+  }
 </style>
