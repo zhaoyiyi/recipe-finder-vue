@@ -16,7 +16,10 @@ const mutations = {
   gotRecipes (state, recipes) {
     state.searchResult = recipes
   },
-  addToList (state, recipe) {
+  addToList (state, {recipe, useAdjusted}) {
+    let ingredients = useAdjusted ? state.selectedRecipe.adjustedIngredients : state.selectedRecipe.ingredientLines
+    recipe.ingredients = ingredients.map(ingred => ({name: ingred, isChecked: false}))
+
     state.shoppingList = Object.assign({}, state.shoppingList, {[recipe.url]: recipe})
   },
   removeFromList (state, recipe) {

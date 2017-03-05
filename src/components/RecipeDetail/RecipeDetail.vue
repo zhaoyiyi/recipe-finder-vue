@@ -6,19 +6,25 @@
         <h1>{{ recipe.label }}</h1>
         <md-button class="md-raised md-accent"
                    :href="recipe.url" target="_blank">See Instructions on {{ recipe.source }}</md-button>
-        <md-button class="md-raised"
-                   @click.native="addToList(recipe)"
-                   v-if="!isInList(recipe)">Add to shopping list</md-button>
+        <div v-if="!isInList(recipe)" class="add">
+          <md-button class="md-raised"
+                     @click.native="addToList({recipe, useAdjusted})">Add to shopping list
+          </md-button>
+          <md-checkbox name="useAdjusted" v-model="useAdjusted">
+            Use adjusted amount
+          </md-checkbox>
+          <md-input-container>
+            <label>Number of Servings</label>
+            <md-input type="number"
+                      v-model.number="portion"
+                      @input="updatePortion(portion)">
+            </md-input>
+          </md-input-container>
+
+        </div>
         <md-button class="md-raised"
                    @click.native="removeFromList(recipe)"
                    v-else>Remove from shopping list</md-button>
-        <md-input-container>
-          <label>Number of Servings</label>
-          <md-input type="number"
-                    v-model.number="portion"
-                    @input="updatePortion(portion)">
-          </md-input>
-        </md-input-container>
       </div>
     </md-card>
     <ingredients
@@ -55,7 +61,10 @@
       'ingredients': Ingredients
     },
     data () {
-      return { portion: 0 }
+      return {
+        portion: 0,
+        useAdjusted: false
+      }
     },
     computed: {
       ...mapState({
@@ -77,6 +86,10 @@
 </script>
 
 <style scoped>
+  .add {
+    display: flex;
+    flex-flow: column;
+  }
   .md-card {
     margin-bottom: 1rem;
     padding: 1rem;
@@ -91,10 +104,11 @@
     justify-content: space-around;
   }
   .header img {
+    height: 100%;
   }
   .header .md-button {
     display: block;
-    margin: 2rem 0;
+    margin: 1rem 0;
   }
   .recipe-detail {
     display: flex;
