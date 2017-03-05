@@ -1,4 +1,7 @@
-# recipe-finder-vue
+# Recipe Finder with Vue.js
+
+##[See Angular version](https://github.com/zhaoyiyi/recipe-finder)
+
 
 > A Vue.js project
 
