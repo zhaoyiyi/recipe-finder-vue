@@ -3,7 +3,9 @@
     <md-toolbar>
       <h2 class="md-title">Recipe Finder</h2>
       <router-link to="/" class="md-button">Search <md-ink-ripple /></router-link>
-      <router-link to="/shopping-list" class="md-button">Shopping List <md-ink-ripple /></router-link>
+      <router-link to="/shopping-list" class="md-button">Shopping List</router-link>
+      <span style="flex: 1;"></span>
+      <md-button href="http://recipe-finder.yizhao.me">Angular Version<md-ink-ripple /></md-button>
     </md-toolbar>
     <router-view></router-view>
   </div>
